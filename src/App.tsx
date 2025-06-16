@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import WorkoutForm from "./pages/WorkoutForm";
@@ -44,8 +44,10 @@ function App() {
       <Routes>
         {user ? (
           <>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard user={user} />} />
+            <Route
+              path="/dashboard"
+              element={<Dashboard user={user} setUser={setUser} />}
+            />
             <Route path="/workout" element={<WorkoutForm user={user} />} />
             <Route path="/history" element={<History user={user} />} />
           </>

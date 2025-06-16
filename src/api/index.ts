@@ -1,14 +1,19 @@
-import type { User } from "../constant/types";
+import type { User, OnboardingForm } from "../constant/types";
 
 //  Current logged-in user
-export async function getCurrentUser() {
-  const res = await fetch("/api/me", { credentials: "include" });
-  if (!res.ok) throw new Error("Not logged in");
-  return res.json();
+export async function getCurrentUser(): Promise<User> {
+  const res = await fetch("/api/me", {
+    credentials: "include", 
+  });
+
+  if (!res.ok) throw new Error("Not authenticated");
+  return await res.json();
 }
 
 //  Register new user after onboarding
-export async function registerUser(user: User) {
+export async function registerUser(user: OnboardingForm) {
+  console.log("Sending registration request with:", user);
+
   const res = await fetch("/api/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,8 +21,12 @@ export async function registerUser(user: User) {
     body: JSON.stringify(user),
   });
 
+  console.log("📥 Registration response:", res.status, res.statusText);
+
   if (!res.ok) {
-    throw new Error(`Registration failed: ${res.status}`);
+    const errorText = await res.text();
+    console.error("❌ Registration failed:", errorText);
+    throw new Error("Registration failed");
   }
 
   return res.json();
@@ -25,28 +34,30 @@ export async function registerUser(user: User) {
 
 
 //  Login via email
-export async function loginUser(email: string) {
-  console.log("📤 Sending login request to /api/login with:", email);
-
-  const res = await fetch("/api/login", {
+export async function loginUser(payload: { email: string; password: string }) {
+  const res = await fetch(`$/api/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(payload),
   });
 
-  console.log("📥 Received login response:", res.status, res.statusText);
-
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error("❌ Login failed response body:", errorText);
-    throw new Error("Login failed");
+    let errorBody = { detail: "Unknown error" };
+    try {
+      errorBody = await res.json();
+    } catch (e) {
+      // silent fail — no JSON body
+    }
+
+    const error: any = new Error("Login failed");
+    error.response = { data: errorBody };
+    throw error;
   }
 
-  const data = await res.json();
-  console.log("✅ Parsed login response JSON:", data);
-  return data;
+  return res.json();
 }
+
 
 //  Submit daily log
 export async function submitLog(log: any) {

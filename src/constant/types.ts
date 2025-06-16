@@ -3,12 +3,29 @@ import type { JSX } from "react";
 // --- Types ---
 export type User = {
   id: number;
-    email: string;
+  email: string;
   name?: string;
   sex?: string;
+  race_date?: Date;
   height?: number;
   weight?: number;
 };
+
+export type OnboardingForm = {
+  email: string;
+  password: string;
+  name: string;
+  sex: string;
+  height: number;
+  weight: number;
+  race_date?: Date;
+  race_level?: "beginner" | "intermediate" | "advanced";
+  pr_5k?: number;
+  pr_10k?: number;
+  pr_half?: number;
+  pr_full?: number;
+};
+
 
 export type DayCompletion = {
   day: string;

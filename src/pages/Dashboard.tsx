@@ -6,9 +6,16 @@ import { WorkoutTable } from "../components/dashboard/WorkoutTable";
 import { Box, Button, Typography } from "@mui/material";
 import type { User, WorkoutEntry, DayCompletion } from "../constant/types";
 import InitialQ from "../components/dashboard/InitalQuestion";
+import CountdownTimer from "../components/dashboard/CountDownTimer";
 import { checkDailyLogExists, getWeeklyDashboardData } from "../api";
 
-export default function Dashboard({ user }: { user: User }) {
+export default function Dashboard({
+  user,
+  setUser,
+}: {
+  user: User;
+  setUser: (user: User | null) => void;
+}) {
   const [showDailyCheck, setShowDailyCheck] = useState(false);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState<DayCompletion[]>([]);
@@ -41,6 +48,7 @@ export default function Dashboard({ user }: { user: User }) {
 
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST", credentials: "include" });
+    setUser(null); // this now triggers redirect in App
     navigate("/", { replace: true });
   };
 
@@ -58,22 +66,24 @@ export default function Dashboard({ user }: { user: User }) {
       />
 
       <Box sx={{ p: 4, display: "flex", flexDirection: "column", gap: 5 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h4" fontWeight="bold">
-            Welcome Back
-          </Typography>
-          <Button variant="outlined" color="error" onClick={handleLogout}>
-            Log Out
-          </Button>
-        </Box>
+        <Box sx={{ p: 4, display: "flex", flexDirection: "column", gap: 5 }}>
+          {user.race_date && <CountdownTimer raceDate={user.race_date} />}
 
-        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold">
+              Welcome Back
+            </Typography>
+            <Button variant="outlined" color="error" onClick={handleLogout}>
+              Log Out
+            </Button>
+          </Box>
+
           <Box
             sx={{
               p: 4,
