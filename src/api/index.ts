@@ -34,24 +34,18 @@ export async function registerUser(user: OnboardingForm) {
 
 
 //  Login via email
-export async function loginUser(payload: { email: string; password: string }) {
-  const res = await fetch(`$/api/login`, {
+export async function loginUser({ email, password }: { email: string; password: string }) {
+  const res = await fetch("/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify(payload),
-  });
+    body: JSON.stringify({ email, password }),
+});
 
   if (!res.ok) {
-    let errorBody = { detail: "Unknown error" };
-    try {
-      errorBody = await res.json();
-    } catch (e) {
-      // silent fail — no JSON body
-    }
-
+    const errBody = await res.json();
     const error: any = new Error("Login failed");
-    error.response = { data: errorBody };
+    error.response = { data: errBody };
     throw error;
   }
 

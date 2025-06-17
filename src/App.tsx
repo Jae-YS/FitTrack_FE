@@ -13,16 +13,19 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCurrentUser()
-      .then((userData) => {
+    // Try to restore session
+    const checkSession = async () => {
+      try {
+        const userData = await getCurrentUser();
         setUser(userData);
-      })
-      .catch(() => {
-        setUser(null);
-      })
-      .finally(() => {
+      } catch (err) {
+        console.error("Session check failed", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    checkSession();
   }, []);
 
   if (loading) {
