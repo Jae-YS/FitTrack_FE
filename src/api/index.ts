@@ -1,4 +1,6 @@
 import type { User, OnboardingForm } from "../constant/types";
+import axios from "axios";
+import type { DayCompletion } from "../constant/types";
 
 //  Current logged-in user
 export async function getCurrentUser(): Promise<User> {
@@ -107,4 +109,20 @@ export async function getWeeklyDashboardData(userId: number) {
   const res = await fetch(`/api/dashboard/weekly/${userId}`);
   if (!res.ok) throw new Error("Failed to fetch dashboard data");
   return res.json(); 
+}
+
+export async function fetchDaysWithCalories(
+  userId: number,
+  days: DayCompletion[]
+): Promise<DayCompletion[]> {
+  const payload = {
+    user_id: userId,
+    days: days.map((d) => ({
+      date: d.date,
+      workouts: d.workouts || [],
+    })),
+  };
+
+  const response = await axios.post("/api/calculate-calories", payload);
+  return response.data.days;
 }

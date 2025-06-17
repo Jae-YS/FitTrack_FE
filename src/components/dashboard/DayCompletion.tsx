@@ -9,6 +9,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import type { DayCompletion } from "../../constant/types";
+import { CustomTooltip } from "./CustomToolTip";
 
 interface WeekdayCaloriesChartProps {
   days: DayCompletion[];
@@ -81,7 +82,7 @@ const WeekdayCaloriesChart: React.FC<WeekdayCaloriesChartProps> = ({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="day" />
             <YAxis />
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
             <Bar
               dataKey="expectedCalories"
               fill="#82ca9d"

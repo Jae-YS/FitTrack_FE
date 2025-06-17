@@ -7,6 +7,7 @@ import { Box, Button, Typography } from "@mui/material";
 import type { User, WorkoutEntry, DayCompletion } from "../constant/types";
 import InitialQ from "../components/dashboard/InitalQuestion";
 import CountdownTimer from "../components/dashboard/CountDownTimer";
+import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
 import { checkDailyLogExists, getWeeklyDashboardData } from "../api";
 
 export default function Dashboard({
@@ -18,8 +19,8 @@ export default function Dashboard({
 }) {
   const [showDailyCheck, setShowDailyCheck] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [days, setDays] = useState<DayCompletion[]>([]);
   const [entries, setEntries] = useState<WorkoutEntry[]>([]);
+  const [daysWithCalories, setDaysWithCalories] = useState<DayCompletion[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,12 +30,19 @@ export default function Dashboard({
         setShowDailyCheck(!exists);
 
         const { days, entries } = await getWeeklyDashboardData(user.id);
-        const abbreviatedDays = days.map((d: { day: string }) => ({
+
+        const processedDays = days.map((d: any) => ({
           ...d,
           day: d.day.slice(0, 3) + ".",
+          expectedCalories: Math.round(d.expectedCalories || 0),
         }));
-        setDays(abbreviatedDays);
-        setEntries(entries);
+
+        const sortedEntries = [...entries].sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        setDaysWithCalories(processedDays);
+        setEntries(sortedEntries);
       } catch (err) {
         console.error("Dashboard init error:", err);
         navigate("/", { replace: true });
@@ -48,7 +56,7 @@ export default function Dashboard({
 
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST", credentials: "include" });
-    setUser(null); // this now triggers redirect in App
+    setUser(null);
     navigate("/", { replace: true });
   };
 
@@ -115,12 +123,26 @@ export default function Dashboard({
               justifyContent: "space-between",
             }}
           >
-            <WeekdayCaloriesChart days={days} />
+            <WeekdayCaloriesChart days={daysWithCalories} />
             <RadialProgressChart goals={[]} />
           </Box>
         </Box>
 
-        <WorkoutTable entries={entries} />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 10,
+            width: "100%",
+            alignItems: "flex-start",
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <WorkoutTable entries={entries} />
+          </Box>
+
+          <WeeklyGoalsCard />
+        </Box>
       </Box>
     </>
   );

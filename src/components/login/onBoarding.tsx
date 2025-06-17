@@ -56,7 +56,7 @@ export const OnboardingPage = ({
       </TextField>
       <TextField
         type="number"
-        label="Height (in)"
+        label="Height (cm)"
         name="height"
         fullWidth
         margin="normal"
@@ -65,7 +65,7 @@ export const OnboardingPage = ({
       />
       <TextField
         type="number"
-        label="Weight (lbs)"
+        label="Weight (kg)"
         name="weight"
         fullWidth
         margin="normal"
@@ -83,6 +83,20 @@ export const OnboardingPage = ({
         value={form.race_date ? form.race_date.toISOString().split("T")[0] : ""}
         onChange={onChange}
       />
+      <TextField
+        label="Race Type"
+        name="race_type"
+        select
+        fullWidth
+        margin="normal"
+        value={form.race_type}
+        onChange={onChange}
+      >
+        <MenuItem value="5k">5K</MenuItem>
+        <MenuItem value="10k">10K</MenuItem>
+        <MenuItem value="half_marathon">Half Marathon</MenuItem>
+        <MenuItem value="full_marathon">Full Marathon</MenuItem>
+      </TextField>
 
       <TextField
         label="Current Level"

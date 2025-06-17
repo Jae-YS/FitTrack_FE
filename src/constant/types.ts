@@ -19,6 +19,7 @@ export type OnboardingForm = {
   height: number;
   weight: number;
   race_date?: Date;
+  race_type?: string;
   race_level?: "beginner" | "intermediate" | "advanced";
   pr_5k?: number;
   pr_10k?: number;
@@ -27,12 +28,6 @@ export type OnboardingForm = {
 };
 
 
-export type DayCompletion = {
-  day: string;
-  date: number;
-  completed: boolean;
-  expectedCalories: number;
-};
 
 export type GoalProgress = {
   label: string;
@@ -56,3 +51,18 @@ export type DayData = {
   sleepHours: number;
   workoutMinutes: number;
 }
+
+export type WorkoutLog = {
+  calories_burned: number;
+  type: string;
+  duration_minutes: number;
+};
+
+export type DayCompletion = {
+  day: string;
+  date: string;
+  completed: boolean;
+  workouts: WorkoutLog[];
+  expectedCalories?: number;
+};
+

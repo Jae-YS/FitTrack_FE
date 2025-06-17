@@ -20,6 +20,7 @@ export default function Auth({
     height: 0,
     weight: 0,
     race_date: undefined,
+    race_type: "",
     race_level: "beginner",
     pr_5k: undefined,
     pr_10k: undefined,
@@ -54,6 +55,7 @@ export default function Auth({
       height: form.height,
       weight: form.weight,
       race_date: form.race_date || undefined,
+      race_type: form.race_type || "",
       race_level: ["beginner", "intermediate", "advanced"].includes(
         form.race_level || ""
       )
