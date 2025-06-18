@@ -1,10 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Bed, Footprints } from "lucide-react";
+
 import { RadialProgressChart } from "../components/dashboard/ProgressChart";
 import WeekdayCaloriesChart from "../components/dashboard/DayCompletion";
 import { WorkoutTable } from "../components/dashboard/WorkoutTable";
-import { Bed, Footprints } from "lucide-react";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import InitialQ from "../components/dashboard/InitalQuestion";
+import CountdownTimer from "../components/dashboard/CountDownTimer";
+import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
+
+import {
+  checkDailyLogExists,
+  getSuggestedWorkouts,
+  getWeeklyDashboardData,
+  getWeeklyProgress,
+} from "../api";
+
 import type {
   User,
   WorkoutEntry,
@@ -12,15 +24,6 @@ import type {
   SuggestedWorkout,
   GoalProgress,
 } from "../constant/types";
-import InitialQ from "../components/dashboard/InitalQuestion";
-import CountdownTimer from "../components/dashboard/CountDownTimer";
-import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
-import {
-  checkDailyLogExists,
-  getSuggestedWorkouts,
-  getWeeklyDashboardData,
-  getWeeklyProgress,
-} from "../api";
 
 export default function Dashboard({
   user,
@@ -31,13 +34,14 @@ export default function Dashboard({
 }) {
   const [showDailyCheck, setShowDailyCheck] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const [entries, setEntries] = useState<WorkoutEntry[]>([]);
   const [suggestedWorkouts, setSuggestedWorkouts] = useState<
     SuggestedWorkout[]
   >([]);
   const [goalProgress, setGoalProgress] = useState<GoalProgress[]>([]);
-
   const [daysWithCalories, setDaysWithCalories] = useState<DayCompletion[]>([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,10 +54,6 @@ export default function Dashboard({
             getSuggestedWorkouts(user.id),
             getWeeklyProgress(user.id),
           ]);
-        console.log("exists:", exists);
-        console.log("dashboardData:", dashboardData);
-        console.log("suggestions:", suggestions);
-        console.log("progress:", progress);
 
         setShowDailyCheck(!exists);
         setSuggestedWorkouts(suggestions);
@@ -75,6 +75,7 @@ export default function Dashboard({
           )
         );
 
+        // Populate radial progress goals
         setGoalProgress([
           {
             label: "Distance",
@@ -91,6 +92,7 @@ export default function Dashboard({
             icon: <Bed size={20} color="#1f2937" />,
           },
         ]);
+
         setLoading(false);
       } catch (err) {
         console.error("Dashboard init error:", err);
@@ -128,64 +130,54 @@ export default function Dashboard({
         open={showDailyCheck}
         onClose={() => setShowDailyCheck(false)}
         userId={user.id}
-        onSubmitted={() => {
-          setShowDailyCheck(false);
-        }}
+        onSubmitted={() => setShowDailyCheck(false)}
       />
 
       <Box sx={{ p: 4, display: "flex", flexDirection: "column", gap: 5 }}>
-        <Box sx={{ p: 4, display: "flex", flexDirection: "column", gap: 5 }}>
-          {user.race_date && <CountdownTimer raceDate={user.race_date} />}
+        {user.race_date && <CountdownTimer raceDate={user.race_date} />}
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h4" fontWeight="bold">
-              Welcome Back
-            </Typography>
-            <Button variant="outlined" color="error" onClick={handleLogout}>
-              Log Out
-            </Button>
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold">
+            Welcome Back
+          </Typography>
+          <Button variant="outlined" color="error" onClick={handleLogout}>
+            Log Out
+          </Button>
+        </Box>
 
-          <Box
-            sx={{
-              p: 4,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-              gap: 5,
-            }}
-          >
-            <Typography variant="h6" fontWeight="medium" mb={2}>
-              This Week's Progress
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/workout")}
-            >
-              Add Workout
-            </Button>
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <Typography variant="h6" fontWeight="medium">
+            This Week's Progress
+          </Typography>
+          <Button variant="contained" onClick={() => navigate("/workout")}>
+            Add Workout
+          </Button>
+        </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              gap: 10,
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <WeekdayCaloriesChart days={daysWithCalories} />
-            <RadialProgressChart goals={goalProgress} />
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 10,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <WeekdayCaloriesChart days={daysWithCalories} />
+          <RadialProgressChart goals={goalProgress} />
         </Box>
 
         <Box
@@ -200,7 +192,6 @@ export default function Dashboard({
           <Box sx={{ flex: 1 }}>
             <WorkoutTable entries={entries} />
           </Box>
-
           <WeeklyGoalsCard workouts={suggestedWorkouts} />
         </Box>
       </Box>
