@@ -3,12 +3,24 @@ import { useNavigate } from "react-router-dom";
 import { RadialProgressChart } from "../components/dashboard/ProgressChart";
 import WeekdayCaloriesChart from "../components/dashboard/DayCompletion";
 import { WorkoutTable } from "../components/dashboard/WorkoutTable";
-import { Box, Button, Typography } from "@mui/material";
-import type { User, WorkoutEntry, DayCompletion } from "../constant/types";
+import { Bed, Footprints } from "lucide-react";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import type {
+  User,
+  WorkoutEntry,
+  DayCompletion,
+  SuggestedWorkout,
+  GoalProgress,
+} from "../constant/types";
 import InitialQ from "../components/dashboard/InitalQuestion";
 import CountdownTimer from "../components/dashboard/CountDownTimer";
 import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
-import { checkDailyLogExists, getWeeklyDashboardData } from "../api";
+import {
+  checkDailyLogExists,
+  getSuggestedWorkouts,
+  getWeeklyDashboardData,
+  getWeeklyProgress,
+} from "../api";
 
 export default function Dashboard({
   user,
@@ -20,33 +32,68 @@ export default function Dashboard({
   const [showDailyCheck, setShowDailyCheck] = useState(false);
   const [loading, setLoading] = useState(true);
   const [entries, setEntries] = useState<WorkoutEntry[]>([]);
+  const [suggestedWorkouts, setSuggestedWorkouts] = useState<
+    SuggestedWorkout[]
+  >([]);
+  const [goalProgress, setGoalProgress] = useState<GoalProgress[]>([]);
+
   const [daysWithCalories, setDaysWithCalories] = useState<DayCompletion[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const init = async () => {
       try {
-        const exists = await checkDailyLogExists(user.id);
+        const [exists, dashboardData, suggestions, progress] =
+          await Promise.all([
+            checkDailyLogExists(user.id),
+            getWeeklyDashboardData(user.id),
+            getSuggestedWorkouts(user.id),
+            getWeeklyProgress(user.id),
+          ]);
+        console.log("exists:", exists);
+        console.log("dashboardData:", dashboardData);
+        console.log("suggestions:", suggestions);
+        console.log("progress:", progress);
+
         setShowDailyCheck(!exists);
+        setSuggestedWorkouts(suggestions);
 
-        const { days, entries } = await getWeeklyDashboardData(user.id);
-
-        const processedDays = days.map((d: any) => ({
-          ...d,
-          day: d.day.slice(0, 3) + ".",
-          expectedCalories: Math.round(d.expectedCalories || 0),
-        }));
-
-        const sortedEntries = [...entries].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        setDaysWithCalories(
+          dashboardData.days.map((d: any) => ({
+            ...d,
+            day: d.day.slice(0, 3) + ".",
+            expectedCalories: Math.round(d.expectedCalories || 0),
+          }))
         );
 
-        setDaysWithCalories(processedDays);
-        setEntries(sortedEntries);
+        setEntries(
+          dashboardData.entries.sort(
+            (
+              a: { date: string | number | Date },
+              b: { date: string | number | Date }
+            ) => new Date(a.date).getTime() - new Date(b.date).getTime()
+          )
+        );
+
+        setGoalProgress([
+          {
+            label: "Distance",
+            completed: progress.distance_km_workouts,
+            target: progress.distance_km_suggested,
+            color: "#3b82f6",
+            icon: <Footprints size={20} color="#1f2937" />,
+          },
+          {
+            label: "Sleep",
+            completed: progress.sleep_hours,
+            target: 56,
+            color: "#10b981",
+            icon: <Bed size={20} color="#1f2937" />,
+          },
+        ]);
+        setLoading(false);
       } catch (err) {
         console.error("Dashboard init error:", err);
-        navigate("/", { replace: true });
-      } finally {
         setLoading(false);
       }
     };
@@ -60,7 +107,20 @@ export default function Dashboard({
     navigate("/", { replace: true });
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          height: "100vh",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress size={48} />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -124,7 +184,7 @@ export default function Dashboard({
             }}
           >
             <WeekdayCaloriesChart days={daysWithCalories} />
-            <RadialProgressChart goals={[]} />
+            <RadialProgressChart goals={goalProgress} />
           </Box>
         </Box>
 
@@ -141,7 +201,7 @@ export default function Dashboard({
             <WorkoutTable entries={entries} />
           </Box>
 
-          <WeeklyGoalsCard />
+          <WeeklyGoalsCard workouts={suggestedWorkouts} />
         </Box>
       </Box>
     </>

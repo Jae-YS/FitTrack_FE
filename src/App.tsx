@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Dashboard from "./pages/Dashboard";
 import WorkoutForm from "./pages/WorkoutForm";
@@ -28,25 +28,12 @@ function App() {
     checkSession();
   }, []);
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          height: "100vh",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress size={48} />
-      </Box>
-    );
-  }
   return (
     <BrowserRouter>
       <Routes>
         {user ? (
           <>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route
               path="/dashboard"
               element={<Dashboard user={user} setUser={setUser} />}

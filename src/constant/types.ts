@@ -27,14 +27,27 @@ export type OnboardingForm = {
   pr_full?: number;
 };
 
+export type SuggestedWorkout = {
+  focus: unknown;
+  id: number;
+  week: number;
+  recommended_date: string;
+  workout_type: string;
+  description: string;
+  duration_minutes: number | null;
+  distance_km: number | null;
+  pace: string | null;
+  goal: string | null;
+  intensity: string | null;
+};
 
 
 export type GoalProgress = {
   label: string;
-  icon: JSX.Element;
   completed: number;
   target: number;
   color: string;
+  icon: JSX.Element;
 };
 
 export type WorkoutEntry ={
