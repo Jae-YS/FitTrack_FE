@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Bed, Footprints } from "lucide-react";
 
 import { RadialProgressChart } from "../components/dashboard/ProgressChart";
@@ -28,12 +28,13 @@ import type {
 export default function Dashboard({
   user,
   setUser,
+  setLoading,
 }: {
   user: User;
   setUser: (user: User | null) => void;
+  setLoading: (loading: boolean) => void;
 }) {
   const [showDailyCheck, setShowDailyCheck] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const [entries, setEntries] = useState<WorkoutEntry[]>([]);
   const [suggestedWorkouts, setSuggestedWorkouts] = useState<
@@ -109,21 +110,6 @@ export default function Dashboard({
     navigate("/", { replace: true });
   };
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          height: "100vh",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CircularProgress size={48} />
-      </Box>
-    );
-  }
-
   return (
     <>
       <InitialQ
@@ -162,9 +148,14 @@ export default function Dashboard({
           <Typography variant="h6" fontWeight="medium">
             This Week's Progress
           </Typography>
-          <Button variant="contained" onClick={() => navigate("/workout")}>
-            Add Workout
-          </Button>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button variant="contained" onClick={() => navigate("/workout")}>
+              Add Workout
+            </Button>
+            <Button variant="contained" onClick={() => navigate("/map")}>
+              Generate Route
+            </Button>
+          </Box>
         </Box>
 
         <Box

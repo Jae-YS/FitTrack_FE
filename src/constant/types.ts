@@ -2,6 +2,7 @@ import type { JSX } from "react";
 
 // --- Types ---
 export type User = {
+  user(user: any): unknown;
   id: number;
   email: string;
   name?: string;
@@ -21,10 +22,10 @@ export type OnboardingForm = {
   race_date?: Date;
   race_type?: string;
   race_level?: "beginner" | "intermediate" | "advanced";
-  pr_5k?: number;
-  pr_10k?: number;
-  pr_half?: number;
-  pr_full?: number;
+  pr_5k?: string;
+  pr_10k?: string;
+  pr_half?: string;
+  pr_full?: string;
 };
 
 export type SuggestedWorkout = {

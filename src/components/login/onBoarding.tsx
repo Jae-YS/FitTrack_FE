@@ -113,36 +113,37 @@ export const OnboardingPage = ({
       </TextField>
 
       <TextField
-        label="5K PR (min)"
+        label="5K PR (mm:ss)"
         name="pr_5k"
-        type="number"
+        type="text"
         value={form.pr_5k}
         onChange={onChange}
         fullWidth
         margin="normal"
       />
+
       <TextField
-        label="10K PR (min)"
+        label="10K PR (mm:ss)"
         name="pr_10k"
-        type="number"
+        type="text"
         value={form.pr_10k}
         onChange={onChange}
         fullWidth
         margin="normal"
       />
       <TextField
-        label="Half PR (min)"
+        label="Half PR (mm:ss)"
         name="pr_half"
-        type="number"
+        type="text"
         value={form.pr_half}
         onChange={onChange}
         fullWidth
         margin="normal"
       />
       <TextField
-        label="Full PR (min)"
+        label="Full PR (mm:ss)"
         name="pr_full"
-        type="number"
+        type="text"
         value={form.pr_full}
         onChange={onChange}
         fullWidth
