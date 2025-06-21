@@ -63,7 +63,7 @@ export const ProgressGraph: React.FC<ProgressGraphProps> = ({ data }) => {
         <Pagination
           count={totalPages}
           page={page}
-          onChange={(e, val) => setPage(val)}
+          onChange={(_, val) => setPage(val)}
           color="primary"
         />
       </Box>

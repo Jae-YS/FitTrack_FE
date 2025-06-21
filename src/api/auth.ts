@@ -25,3 +25,10 @@ export async function loginUser(credentials: { email: string; password: string }
     throw new Error(err.response?.data?.detail || "Login failed");
   }
 }
+
+
+export async function logoutUser(): Promise<void> {
+  await api.post("/users/logout", { credentials: "include" });
+
+}
+

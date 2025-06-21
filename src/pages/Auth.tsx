@@ -11,7 +11,6 @@ export default function Auth({
   onAuthenticated: (user: User) => void;
 }) {
   const [step, setStep] = useState<"login" | "onboarding">("login");
-  const [user, setUser] = useState<User | null>(null);
   const [form, setForm] = useState<OnboardingForm>({
     email: "",
     password: "",
@@ -36,14 +35,12 @@ export default function Auth({
     const seconds = parseInt(secStr, 10);
     return minutes + seconds / 60;
   }
-
   const handleLogin = async (email: string, password: string) => {
     try {
       console.log("Attempting login for email:", email);
       const res = await loginUser({ email, password });
       console.log("Login successful:", res);
 
-      setUser(res);
       onAuthenticated(res);
       navigate("/dashboard");
     } catch (err: any) {
@@ -74,7 +71,6 @@ export default function Auth({
       pr_full: form.pr_full ? timeStrToMinutes(form.pr_full) : undefined,
     });
 
-    setUser(savedUser);
     onAuthenticated(savedUser);
     navigate("/dashboard");
   };

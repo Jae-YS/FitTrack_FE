@@ -15,3 +15,10 @@ export async function submitWorkout(workout: {
   const res = await api.post("/logs/workouts", workout); // workout logging is under the logs router
   return res.data;
 }
+
+
+export async function generateNewWorkout(userId: number): Promise<SuggestedWorkout> {
+  console.log("Generating new workout for user:", userId);
+  const res = await api.post(`/suggestions/next-suggested-workout/${userId}`);
+  return res.data;
+}

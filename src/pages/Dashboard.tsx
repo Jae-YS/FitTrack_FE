@@ -12,9 +12,11 @@ import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
 
 import {
   checkDailyLogExists,
+  generateNewWorkout,
   getSuggestedWorkouts,
   getWeeklyDashboardData,
   getWeeklyProgress,
+  logoutUser,
 } from "../api";
 
 import type {
@@ -76,7 +78,6 @@ export default function Dashboard({
           )
         );
 
-        // Populate radial progress goals
         setGoalProgress([
           {
             label: "Distance",
@@ -104,8 +105,29 @@ export default function Dashboard({
     init();
   }, [user.id]);
 
+  useEffect(() => {
+    console.log("Calling generateNewWorkout for user", user.id);
+
+    const generate = async () => {
+      try {
+        const workout = await generateNewWorkout(user.id);
+        if (workout?.id) {
+          setSuggestedWorkouts((prev) => [...prev, workout]);
+        }
+      } catch (err: any) {
+        if (err.response?.status === 403) {
+          console.log("Not Sunday — skipping workout generation");
+        } else {
+          console.error("Workout generation error:", err);
+        }
+      }
+    };
+
+    if (user?.id) generate();
+  }, [user?.id]);
+
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" });
+    await logoutUser();
     setUser(null);
     navigate("/", { replace: true });
   };

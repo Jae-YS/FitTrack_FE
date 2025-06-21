@@ -9,3 +9,4 @@ export async function checkDailyLogExists(userId: number): Promise<boolean> {
   const res = await api.get(`/logs/exists/${userId}`);
   return res.data.exists;
 }
+
