@@ -5,6 +5,8 @@ export async function generateRoute(
   lat: number,
   lng: number
 ): Promise<any> {
+  console.log("Generating route for user:", userId);
+  console.log("Start coordinates:", { lat, lng });
   const res = await api.post("/routes/generate-route", {
     user_id: userId,
     start_lat: lat,
@@ -14,10 +16,7 @@ export async function generateRoute(
 }
 
 export async function geocodeLocation(query: string): Promise<[number, number]> {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-  );
-  const data = await res.json();
-  if (!data.length) throw new Error("Location not found");
-  return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+  const res = await api.get(`/routes/geocode?q=${encodeURIComponent(query)}`);
+  const { lat, lon } = res.data;
+  return [lat, lon];
 }

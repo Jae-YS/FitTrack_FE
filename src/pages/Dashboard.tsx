@@ -7,7 +7,6 @@ import { RadialProgressChart } from "../components/dashboard/ProgressChart";
 import WeekdayCaloriesChart from "../components/dashboard/DayCompletion";
 import { WorkoutTable } from "../components/dashboard/WorkoutTable";
 import InitialQ from "../components/dashboard/InitalQuestion";
-import CountdownTimer from "../components/dashboard/CountDownTimer";
 import WeeklyGoalsCard from "../components/dashboard/WeeklyGoalsCard";
 
 import {
@@ -62,7 +61,7 @@ export default function Dashboard({
         setSuggestedWorkouts(suggestions);
 
         setDaysWithCalories(
-          dashboardData.days.map((d: any) => ({
+          dashboardData.days.map((d) => ({
             ...d,
             day: d.day.slice(0, 3) + ".",
             expectedCalories: Math.round(d.expectedCalories || 0),
@@ -103,28 +102,22 @@ export default function Dashboard({
     };
 
     init();
-  }, [user.id]);
+  }, [setLoading, user.id]);
 
-  useEffect(() => {
-    console.log("Calling generateNewWorkout for user", user.id);
-
-    const generate = async () => {
-      try {
-        const workout = await generateNewWorkout(user.id);
-        if (workout?.id) {
-          setSuggestedWorkouts((prev) => [...prev, workout]);
-        }
-      } catch (err: any) {
-        if (err.response?.status === 403) {
-          console.log("Not Sunday — skipping workout generation");
-        } else {
-          console.error("Workout generation error:", err);
-        }
+  const handleGenerateWorkout = async () => {
+    try {
+      const workout = await generateNewWorkout(user.id);
+      if (workout?.id) {
+        setSuggestedWorkouts((prev) => [...prev, workout]);
       }
-    };
-
-    if (user?.id) generate();
-  }, [user?.id]);
+    } catch (err) {
+      if (err.response?.status === 403) {
+        console.log("Not Sunday — skipping workout generation");
+      } else {
+        console.error("Workout generation error:", err);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     await logoutUser();
@@ -142,8 +135,6 @@ export default function Dashboard({
       />
 
       <Box sx={{ p: 4, display: "flex", flexDirection: "column", gap: 5 }}>
-        {user.race_date && <CountdownTimer raceDate={user.race_date} />}
-
         <Box
           sx={{
             display: "flex",
@@ -176,6 +167,9 @@ export default function Dashboard({
             </Button>
             <Button variant="contained" onClick={() => navigate("/map")}>
               Generate Route
+            </Button>
+            <Button variant="contained" onClick={handleGenerateWorkout}>
+              Generate New Workout
             </Button>
           </Box>
         </Box>

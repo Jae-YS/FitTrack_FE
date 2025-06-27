@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme, Paper } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { DayCompletion } from "../../constant/types";
 import { CustomTooltip } from "./CustomToolTip";
+import TrainingCalendar from "./TrainingCalendar";
 
 interface WeekdayCaloriesChartProps {
   days: DayCompletion[];
@@ -18,80 +19,78 @@ interface WeekdayCaloriesChartProps {
 const WeekdayCaloriesChart: React.FC<WeekdayCaloriesChartProps> = ({
   days,
 }) => {
+  const theme = useTheme();
   const completedCount = days.filter((d) => d.completed).length;
 
   return (
-    <Box
+    <Paper
+      elevation={1}
       sx={{
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
-        alignItems: "flex-start",
         gap: 4,
-        backgroundColor: "#f5f5f5",
         borderRadius: 3,
-        p: 2,
+        p: 3,
         width: "100%",
-        maxWidth: 900,
+        maxWidth: 1000,
+        backgroundColor: theme.palette.background.default,
       }}
     >
-      {/* Left: Tracker */}
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-          Workout 5x
-        </Typography>
-        <Typography variant="body2" mb={2}>
-          {completedCount} days completed
-        </Typography>
-
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {days.map((d) => (
-            <Box
-              key={d.day}
-              sx={{
-                width: 48,
-                height: 64,
-                borderRadius: 2,
-                backgroundColor: d.completed ? "#c3f2a0" : "#e0e0e0",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Typography fontSize="14px" fontWeight="bold" mb={0.5}>
-                {d.completed ? "✔️" : d.date}
-              </Typography>
-              <Typography fontSize="12px" color="text.primary">
-                {d.day}
-              </Typography>
-            </Box>
-          ))}
+      {/* Left: Streak + Calendar */}
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 280,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box>
+          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+            Ongoing Streak
+          </Typography>
+          <Typography variant="body2" mb={2}>
+            {completedCount} days completed
+          </Typography>
         </Box>
+
+        <TrainingCalendar />
       </Box>
 
-      {/* Right: Bar Chart */}
-      <Box sx={{ flex: 1, minHeight: 200 }}>
+      {/* Right: Calories Chart */}
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 280,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography variant="subtitle1" fontWeight="bold" mb={1}>
           Expected Calories Burned
         </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart
-            data={days}
-            margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar
-              dataKey="expectedCalories"
-              fill="#82ca9d"
-              radius={[6, 6, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+
+        <Box sx={{ flex: 1 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={days}
+              margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="expectedCalories"
+                fill={theme.palette.primary.main}
+                radius={[6, 6, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </Box>
       </Box>
-    </Box>
+    </Paper>
   );
 };
 

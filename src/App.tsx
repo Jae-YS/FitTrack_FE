@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Countdown from "./components/Countdown";
 import Dashboard from "./pages/Dashboard";
 import WorkoutForm from "./pages/WorkoutForm";
 import History from "./pages/History";
@@ -9,6 +10,7 @@ import type { User } from "./constant/types";
 import Loader from "./components/loader";
 import MapView from "./pages/MapView";
 import "leaflet/dist/leaflet.css";
+import "./App.css"; // Import global styles
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -82,6 +84,7 @@ function App() {
           <Route path="/" element={<Auth onAuthenticated={setUser} />} />
         )}
       </Routes>
+      {user && <Countdown user={user} />}
     </BrowserRouter>
   );
 }
